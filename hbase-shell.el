@@ -20,6 +20,11 @@
   "Split String with space, and remove all empty element"
   (remove "" (split-string str "\s")))
 
+(defun build-titles (lst)
+  (if (string= (car lst) 'ROW)
+      '("ROW" "COLUMN" "TIMESTAMP" "VALUE")
+    lst))
+
 (defun hbase-shell--list-all-async (process signal)
   "Run hbase-shell Async and list resource"
   (when (memq (process-status process) '(exit))
@@ -28,8 +33,8 @@
                                    (split-string (substring hbase-shell--asyn-process-output 
                                                             (string-match "hbase(main)" hbase-shell--asyn-process-output)
                                                             (string-match " seconds" hbase-shell--asyn-process-output)) "\n"))))
-          (titles (nth 1 output))
-          (data (cdr output))
+          (titles (build-titles (nth 1 output)))
+          (data (cddr output))
           (the-buffer (process-buffer process)))
       (hbase-shell--show-ctable titles data the-buffer (process-command process) nil))))
 
