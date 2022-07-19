@@ -75,23 +75,23 @@
   (setq buffer-read-only t))
 
 
-(defun run-hbase-shell (command)
+(defun run-hbase-shell (command sentinel)
   (let* ((process-name (concat "hbase-shell-" command))
          (process-buffer-name (concat "*hbase-shell-" command "*"))
          (process (start-process-shell-command process-name process-buffer-name (concat "echo \"" command "\" | " hbase-shell-bin " shell"))))
     (set-process-filter process 'hbase-shell--output-to-local-buffer-variable)
-    (set-process-sentinel process 'hbase-shell--list-all-async)))
+    (set-process-sentinel process sentinel)))
 
 
 (defun hbase-shell-list-tables()
   "hbase-shell list tables"
   (interactive)
-  (run-hbase-shell "list"))
+  (run-hbase-shell "list" #'hbase-shell--list-all-async))
 
 (defun hbase-shell-scan-table (table-name)
   "hbase-shell list tables"
   (interactive "sHbase table name: ")
-  (run-hbase-shell (concat "scan '" table-name "'")))
+  (run-hbase-shell (format "scan '%s'" table-name) #'hbase-shell--list-all-async))
 
 
 (defun combine-hbase-shell-command (command parameters)
@@ -108,25 +108,29 @@
   (interactive "sHbase table name: \nsHbase rowkey: \nsColumn: \nsColumn Value: ")
   (let* ((parameters (list table-name rowkey column value))
          (command (combine-hbase-shell-command "put" parameters)))
-    (run-hbase-shell command)
+    (run-hbase-shell command #'hbase-shell--list-all-async)
     ))
 
 (defun hbase-shell-delete (table-name
                         rowkey
                         column
                         &optional timestamp)
-  "hbase-shell list tables"
+  "hbase-shell delete cell"
   (interactive "sHbase table name: \nsHbase rowkey: \nsColumn: \ns Timestamp: ")
   (let* ((parameters (list table-name rowkey column timestamp))
          (command (combine-hbase-shell-command "delete" parameters)))
-    (run-hbase-shell command)))
-
+    (run-hbase-shell command #'hbase-shell--list-all-async)))
 
 
 (defun hbase-shell-get (table-name rowkey)
   "hbase-shell list tables"
   (interactive "sHbase table name: \nsRowkey: ")
-  (run-hbase-shell (format "get '%s', '%s'" table-name rowkey)))
+  (run-hbase-shell (format "get '%s', '%s'" table-name rowkey) #'hbase-shell--list-all-async))
+
+(defun hbase-query-table (regex)
+  "Hbase Shell query table by regex"
+  (interactive "sHbase table name Regex: ")
+  (run-hbase-shell (format "list '%s' " regex) #'hbase-shell--list-all-async))
 
 (provide 'hbase-shell)
 ;;; hbase-shell.el ends here
