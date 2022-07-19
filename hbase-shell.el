@@ -121,5 +121,12 @@
          (command (combine-hbase-shell-command "delete" parameters)))
     (run-hbase-shell command)))
 
+
+
+(defun hbase-shell-get (table-name rowkey)
+  "hbase-shell list tables"
+  (interactive "sHbase table name: \nsRowkey: ")
+  (run-hbase-shell (format "get '%s', '%s'" table-name rowkey)))
+
 (provide 'hbase-shell)
 ;;; hbase-shell.el ends here
