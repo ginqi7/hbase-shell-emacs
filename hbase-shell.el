@@ -38,6 +38,20 @@
           (the-buffer (process-buffer process)))
       (hbase-shell--show-ctable titles data the-buffer (process-command process) nil))))
 
+(defun hbase-shell--list-in-minibuffer-async (process signal)
+  "Run hbase-shell Async and list resource"
+  (when (memq (process-status process) '(exit))
+    (let* ((output (remove nil 
+                           (mapcar 'hbase-shell--split-string-wtith-blank
+                                   (split-string (substring hbase-shell--asyn-process-output 
+                                                            (string-match "hbase(main)" hbase-shell--asyn-process-output)
+                                                            (string-match " seconds" hbase-shell--asyn-process-output)) "\n"))))
+          (titles (build-titles (nth 1 output)))
+          (data (cddr output))
+          (the-buffer (process-buffer process)))
+      (completing-read "table: " data))))
+
+
 (defun hbase-shell--list-all (buffer-name shell-command)
   "Run hbase-shell and list resource"
   (setq hbase-shell--asyn-process-output nil)
@@ -79,6 +93,7 @@
   (let* ((process-name (concat "hbase-shell-" command))
          (process-buffer-name (concat "*hbase-shell-" command "*"))
          (process (start-process-shell-command process-name process-buffer-name (concat "echo \"" command "\" | " hbase-shell-bin " shell"))))
+    (message command)
     (set-process-filter process 'hbase-shell--output-to-local-buffer-variable)
     (set-process-sentinel process sentinel)))
 
@@ -127,7 +142,7 @@
   (interactive "sHbase table name: \nsRowkey: ")
   (run-hbase-shell (format "get '%s', '%s'" table-name rowkey) #'hbase-shell--list-all-async))
 
-(defun hbase-query-table (regex)
+(defun hbase-shell-query-table (regex)
   "Hbase Shell query table by regex"
   (interactive "sHbase table name Regex: ")
   (run-hbase-shell (format "list '%s' " regex) #'hbase-shell--list-all-async))
