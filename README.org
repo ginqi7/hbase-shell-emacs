@@ -1,0 +1,43 @@
+This is a Emacs plugin to quickly access hbase shell.
+
+* Installing
+
+- clone the project in your own emacs configuration files directory, like:
+
+#+begin_src bash
+git clone git@github.com:ginqi7/hbase-shell-emacs.git ~/.emacs.d/lisp/hbase-shell-emacs
+#+end_src
+
+- add the path to ‘load-path’
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/hbase-shell-emacs"))
+#+end_src
+
+* Configuration
+#+begin_src emacs-lisp
+(setq hbase-shell-bin "/path/...") ; hbase shell path
+#+end_src
+
+* Features
+- hbase-shell-list-tables
+- hbase-shell-scan-table
+- hbase-shell-get
+- hbase-shell-put
+- hbase-shell-query-table
+
+* Example
+**  hbase-shell-list-tables
+When you run 'hbase-shell-list-tables' will show all tables in hbase.
+
+[[file:example/hbase-shell-list-table.png]]
+
+**  hbase-shell-scan-table
+#+HTML: <p align="center"><img width="600px" src="./example/hbase-shell-scan-table.gif"></p>
+**  hbase-shell-get
+#+HTML: <p align="center"><img width="600px" src="./example/hbase-shell-get.gif"></p>
+**  hbase-shell-put
+#+HTML: <p align="center"><img width="600px" src="./example/hbase-shell-get.gif"></p>
+**  hbase-shell-query-table
+You can use Regex to query tables in hbase
+#+HTML: <p align="center"><img width="600px" src="./example/hbase-shell-query-table.gif"></p>

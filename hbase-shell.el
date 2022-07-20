@@ -21,9 +21,11 @@
   (remove "" (split-string str "\s")))
 
 (defun build-titles (lst)
-  (if (string= (car lst) 'ROW)
-      '("ROW" "COLUMN" "TIMESTAMP" "VALUE")
-    lst))
+  (let ((first-item (car lst)))
+    (cond ((string= first-item 'ROW) '("ROW" "COLUMN" "TIMESTAMP" "VALUE"))
+          ((string= first-item 'COLUMN) '("COLUMN" "TIMESTAMP" "VALUE"))
+          (t lst)
+          )))
 
 (defun hbase-shell--list-all-async (process signal)
   "Run hbase-shell Async and list resource"
@@ -104,7 +106,7 @@
   (run-hbase-shell "list" #'hbase-shell--list-all-async))
 
 (defun hbase-shell-scan-table (table-name)
-  "hbase-shell list tables"
+  "hbase-shell scan tables"
   (interactive "sHbase table name: ")
   (run-hbase-shell (format "scan '%s'" table-name) #'hbase-shell--list-all-async))
 
@@ -117,9 +119,8 @@
 (defun hbase-shell-put (table-name
                         rowkey
                         column
-                        value
-                        )
-  "hbase-shell list tables"
+                        value)
+  "hbase-shell put"
   (interactive "sHbase table name: \nsHbase rowkey: \nsColumn: \nsColumn Value: ")
   (let* ((parameters (list table-name rowkey column value))
          (command (combine-hbase-shell-command "put" parameters)))
@@ -138,7 +139,7 @@
 
 
 (defun hbase-shell-get (table-name rowkey)
-  "hbase-shell list tables"
+  "hbase-shell get"
   (interactive "sHbase table name: \nsRowkey: ")
   (run-hbase-shell (format "get '%s', '%s'" table-name rowkey) #'hbase-shell--list-all-async))
 
